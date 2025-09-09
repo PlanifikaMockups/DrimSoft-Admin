@@ -205,17 +205,17 @@ export function InstitutionListPage() {
                     onClick={() => setPage(page - 1)}
                     disabled={page <= 1}
                   >
-                    Previous
+                    Anterior
                   </Button>
                   <span className="flex items-center px-4">
-                    Page {page} of {data.totalPages}
+                    Página {page} de {data.totalPages}
                   </span>
                   <Button
                     variant="outline"
                     onClick={() => setPage(page + 1)}
                     disabled={page >= data.totalPages}
                   >
-                    Next
+                    Siguiente
                   </Button>
                 </div>
               )}
