@@ -9,197 +9,15 @@ import { Search, Filter, Eye, FolderOpen, Clock, DollarSign, TrendingUp } from '
 import { Project, ProjectType, ProjectStatus, Organization } from '@/types'
 import { formatDate, formatCurrency, formatPercentage, getStatusColor } from '@/lib/utils'
 
-// Datos quemados para pruebas
-const mockOrganizations: Organization[] = [
-  {
-    id: '1',
-    name: 'TechCorp Solutions',
-    address: '123 Innovation Ave, Tech City',
-    phone: '+1 (555) 123-4567',
-    domain: 'techcorp.com',
-    plan: 'Enterprise' as any,
-    status: 'Activa' as any,
-    photoURL: 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?w=150',
-    adminCount: 3,
-    projectCount: 8,
-    mau: 1250,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '2',
-    name: 'Global Manufacturing Inc',
-    address: '456 Industrial Blvd, Factory Town',
-    phone: '+1 (555) 234-5678',
-    domain: 'globalmanufacturing.com',
-    plan: 'Pro' as any,
-    status: 'Activa' as any,
-    adminCount: 2,
-    projectCount: 5,
-    mau: 850,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '3',
-    name: 'Healthcare Partners',
-    address: '789 Medical Center Dr, Health City',
-    phone: '+1 (555) 345-6789',
-    domain: 'healthcarepartners.org',
-    plan: 'Pro' as any,
-    status: 'Activa' as any,
-    adminCount: 4,
-    projectCount: 6,
-    mau: 2100,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-]
+// Import university data from fixtures
+import { mockOrganizations, mockProjects } from '@/mocks/fixtures'
 
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    name: 'Digital Transformation Initiative',
-    description: 'Complete overhaul of legacy systems to modern cloud-based architecture',
-    type: ProjectType.DESARROLLO,
-    status: ProjectStatus.EN_CURSO,
-    startDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
-    endDate: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
-    budget: 500000,
-    cost: 320000,
-    percentageBudgetExecution: 0.64,
-    percentageProgress: 0.72,
-    organizationId: '1',
-    organization: mockOrganizations[0],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '2',
-    name: 'ERP Implementation',
-    description: 'Implementation of comprehensive ERP system for manufacturing operations',
-    type: ProjectType.IMPLEMENTACION,
-    status: ProjectStatus.EN_REVISION,
-    startDate: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000),
-    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    budget: 750000,
-    cost: 680000,
-    percentageBudgetExecution: 0.91,
-    percentageProgress: 0.95,
-    organizationId: '2',
-    organization: mockOrganizations[1],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '3',
-    name: 'Patient Management System',
-    description: 'Electronic health records and patient management platform',
-    type: ProjectType.DESARROLLO,
-    status: ProjectStatus.EN_RIESGO,
-    startDate: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000),
-    endDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-    budget: 300000,
-    cost: 280000,
-    percentageBudgetExecution: 0.93,
-    percentageProgress: 0.65,
-    organizationId: '3',
-    organization: mockOrganizations[2],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '4',
-    name: 'Mobile App Development',
-    description: 'Customer-facing mobile application for service booking',
-    type: ProjectType.DESARROLLO,
-    status: ProjectStatus.EN_CURSO,
-    startDate: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
-    endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-    budget: 150000,
-    cost: 65000,
-    percentageBudgetExecution: 0.43,
-    percentageProgress: 0.55,
-    organizationId: '1',
-    organization: mockOrganizations[0],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '5',
-    name: 'Security Audit & Compliance',
-    description: 'Comprehensive security assessment and compliance implementation',
-    type: ProjectType.CONSULTORIA,
-    status: ProjectStatus.CERRADO,
-    startDate: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000),
-    endDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    budget: 100000,
-    cost: 95000,
-    percentageBudgetExecution: 0.95,
-    percentageProgress: 1.0,
-    organizationId: '2',
-    organization: mockOrganizations[1],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '6',
-    name: 'Financial Analytics Platform',
-    description: 'Advanced analytics platform for financial data processing and reporting',
-    type: ProjectType.DESARROLLO,
-    status: ProjectStatus.EN_CURSO,
-    startDate: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000),
-    endDate: new Date(Date.now() + 80 * 24 * 60 * 60 * 1000),
-    budget: 800000,
-    cost: 450000,
-    percentageBudgetExecution: 0.56,
-    percentageProgress: 0.68,
-    organizationId: '3',
-    organization: mockOrganizations[2],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '7',
-    name: 'E-commerce Integration',
-    description: 'Integration of multiple e-commerce platforms for unified management',
-    type: ProjectType.IMPLEMENTACION,
-    status: ProjectStatus.EN_REVISION,
-    startDate: new Date(Date.now() - 80 * 24 * 60 * 60 * 1000),
-    endDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
-    budget: 300000,
-    cost: 280000,
-    percentageBudgetExecution: 0.93,
-    percentageProgress: 0.88,
-    organizationId: '1',
-    organization: mockOrganizations[0],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: '8',
-    name: 'Supply Chain Optimization',
-    description: 'AI-powered supply chain management and optimization system',
-    type: ProjectType.DESARROLLO,
-    status: ProjectStatus.EN_CURSO,
-    startDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
-    endDate: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
-    budget: 400000,
-    cost: 180000,
-    percentageBudgetExecution: 0.45,
-    percentageProgress: 0.42,
-    organizationId: '2',
-    organization: mockOrganizations[1],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-]
 
 export function ProjectListPage() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
 
-  // Usar datos quemados directamente
+  // Usar datos de universidades directamente
   const projects = mockProjects
   const data = {
     data: projects,
@@ -221,9 +39,9 @@ export function ProjectListPage() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Proyectos Académicos</h1>
           <p className="text-muted-foreground">
-            Monitor and manage all active projects across organizations
+            Monitorea y gestiona todos los proyectos activos en las universidades
           </p>
         </div>
       </div>
@@ -232,7 +50,7 @@ export function ProjectListPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Proyectos</CardTitle>
             <FolderOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -242,7 +60,7 @@ export function ProjectListPage() {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+            <CardTitle className="text-sm font-medium">Proyectos Activos</CardTitle>
             <Clock className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -252,7 +70,7 @@ export function ProjectListPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Budget</CardTitle>
+            <CardTitle className="text-sm font-medium">Presupuesto Total</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -262,7 +80,7 @@ export function ProjectListPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Progress</CardTitle>
+            <CardTitle className="text-sm font-medium">Progreso Promedio</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -281,7 +99,7 @@ export function ProjectListPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search projects..."
+                placeholder="Buscar proyectos..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-10"
@@ -298,26 +116,26 @@ export function ProjectListPage() {
       {/* Projects Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Projects</CardTitle>
+          <CardTitle>Proyectos Académicos</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">Loading projects...</div>
+              <div className="text-muted-foreground">Cargando proyectos...</div>
             </div>
           ) : (
             <div className="space-y-4">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Project</TableHead>
-                    <TableHead>Organization</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Progress</TableHead>
-                    <TableHead>Budget</TableHead>
-                    <TableHead>Due Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>Proyecto</TableHead>
+                    <TableHead>Universidad</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Progreso</TableHead>
+                    <TableHead>Presupuesto</TableHead>
+                    <TableHead>Fecha Límite</TableHead>
+                    <TableHead>Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -374,7 +192,7 @@ export function ProjectListPage() {
                         <div>
                           <div className="font-medium">{formatCurrency(project.budget)}</div>
                           <div className="text-xs text-muted-foreground">
-                            {formatPercentage(project.percentageBudgetExecution)} used
+                            {formatPercentage(project.percentageBudgetExecution)} usado
                           </div>
                         </div>
                       </TableCell>
@@ -399,17 +217,17 @@ export function ProjectListPage() {
                     onClick={() => setPage(page - 1)}
                     disabled={page <= 1}
                   >
-                    Previous
+                    Anterior
                   </Button>
                   <span className="flex items-center px-4">
-                    Page {page} of {data.totalPages}
+                    Página {page} de {data.totalPages}
                   </span>
                   <Button
                     variant="outline"
                     onClick={() => setPage(page + 1)}
                     disabled={page >= data.totalPages}
                   >
-                    Next
+                    Siguiente
                   </Button>
                 </div>
               )}

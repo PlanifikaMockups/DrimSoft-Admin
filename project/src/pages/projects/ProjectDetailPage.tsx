@@ -70,7 +70,7 @@ export function ProjectDetailPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link to="/projects">
               <ChevronLeft className="h-4 w-4 mr-1" />
-              Back to Projects
+              Volver a Proyectos
             </Link>
           </Button>
         </div>

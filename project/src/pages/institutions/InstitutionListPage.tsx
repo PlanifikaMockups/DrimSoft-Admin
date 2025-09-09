@@ -50,9 +50,9 @@ export function InstitutionListPage() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Organizaciones</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Universidades</h1>
           <p className="text-muted-foreground">
-            Gestiona y monitorea todas las organizaciones cliente
+            Gestiona y monitorea todas las universidades cliente
           </p>
         </div>
       </div>
@@ -61,7 +61,7 @@ export function InstitutionListPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Organizaciones</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Universidades</CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -83,7 +83,7 @@ export function InstitutionListPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Proyectos</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Proyectos Académicos</CardTitle>
             <FolderOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -95,7 +95,7 @@ export function InstitutionListPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total MAU</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Estudiantes</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -109,14 +109,14 @@ export function InstitutionListPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filters & Search</CardTitle>
+          <CardTitle className="text-lg">Filtros y Búsqueda</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search organizations..."
+                placeholder="Buscar universidades..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-10"
@@ -124,34 +124,33 @@ export function InstitutionListPage() {
             </div>
             <Button variant="outline" className="sm:w-auto w-full">
               <Filter className="h-4 w-4 mr-2" />
-              Filters
+              Filtros
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Organizations Table */}
+      {/* Universities Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Organizations</CardTitle>
+          <CardTitle>Universidades</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">Loading organizations...</div>
+              <div className="text-muted-foreground">Cargando universidades...</div>
             </div>
           ) : (
             <div className="space-y-4">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Organization</TableHead>
-                    <TableHead>Plan</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Projects</TableHead>
-                    <TableHead>MAU</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>Universidad</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Proyectos</TableHead>
+                    <TableHead>Estudiantes</TableHead>
+                    <TableHead>Creado</TableHead>
+                    <TableHead>Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -177,9 +176,6 @@ export function InstitutionListPage() {
                             <div className="text-sm text-muted-foreground">{org.domain}</div>
                           </div>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{org.plan}</Badge>
                       </TableCell>
                       <TableCell>
                         <Badge className={getStatusColor(org.status)}>
