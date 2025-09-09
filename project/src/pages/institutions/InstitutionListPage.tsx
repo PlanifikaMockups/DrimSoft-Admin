@@ -142,18 +142,19 @@ export function InstitutionListPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Universidad</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Proyectos</TableHead>
-                    <TableHead>Estudiantes</TableHead>
-                    <TableHead>Creado</TableHead>
-                    <TableHead>Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Universidad</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead>Proyectos</TableHead>
+                      <TableHead>Estudiantes</TableHead>
+                      <TableHead>Creado</TableHead>
+                      <TableHead>Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                   {organizations.map((org) => (
                     <TableRow key={org.id}>
                       <TableCell>
@@ -194,8 +195,9 @@ export function InstitutionListPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
-              </Table>
+                  </TableBody>
+                </Table>
+              </div>
 
               {/* Pagination */}
               {data && data.totalPages > 1 && (

@@ -12,7 +12,7 @@ export function Layout() {
       <Sidebar />
       <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-0'}`}>
         <Header />
-        <main className="p-6 bg-transparent">
+        <main className="p-3 sm:p-4 lg:p-6 bg-transparent">
           <Outlet />
         </main>
       </div>
