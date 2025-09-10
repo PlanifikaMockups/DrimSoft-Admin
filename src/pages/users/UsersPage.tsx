@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Search, Users, Shield, Mail, Calendar, Clock, Globe, Building2 } from 'lucide-react'
-import { User, UserStatus, Role, Organization } from '@/types'
+import { Search, Users, Shield, Mail, Calendar, Clock, Globe, Building2, Plus, Edit, Trash2, UserPlus, Settings } from 'lucide-react'
+import { User, UserStatus, Role, Organization, SystemPermission, CreateUserForm, UpdateUserForm } from '@/types'
+import { useAuth } from '@/contexts/AuthContext'
 
 // Extender el tipo User para incluir información de tiempo real
 interface UserWithRealtime extends User {
@@ -13,6 +14,16 @@ interface UserWithRealtime extends User {
   lastSeen: Date
   currentSessionStart?: Date
   organization?: Organization
+}
+
+// Estado para modales y formularios
+interface UserManagementState {
+  showCreateModal: boolean
+  showEditModal: boolean
+  showDeleteModal: boolean
+  selectedUser: UserWithRealtime | null
+  createForm: CreateUserForm
+  editForm: UpdateUserForm
 }
 
 // Datos mock de universidades (organizaciones)
@@ -287,7 +298,28 @@ function formatSessionDuration(startDate: Date): string {
 }
 
 export function UsersPage() {
+  const { hasPermission, isAdmin } = useAuth()
   const [search, setSearch] = useState('')
+  const [managementState, setManagementState] = useState<UserManagementState>({
+    showCreateModal: false,
+    showEditModal: false,
+    showDeleteModal: false,
+    selectedUser: null,
+    createForm: {
+      name: '',
+      email: '',
+      role: Role.MEMBER,
+      status: UserStatus.ACTIVO
+    },
+    editForm: {
+      id: '',
+      name: '',
+      email: '',
+      role: Role.MEMBER,
+      status: UserStatus.ACTIVO
+    }
+  })
+
   // Actualizar tiempo cada minuto para mostrar información en tiempo real
   useEffect(() => {
     const interval = setInterval(() => {
@@ -318,6 +350,53 @@ export function UsersPage() {
   const onlineUsers = filteredUsers.filter(user => user.isOnline).length
   const totalUsers = filteredUsers.length
   const drimsoftUsers = filteredUsers.filter(user => !user.organization).length
+
+  // Funciones de gestión de usuarios
+  const handleCreateUser = () => {
+    setManagementState(prev => ({ ...prev, showCreateModal: true }))
+  }
+
+  const handleEditUser = (user: UserWithRealtime) => {
+    setManagementState(prev => ({
+      ...prev,
+      showEditModal: true,
+      selectedUser: user,
+      editForm: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role || Role.MEMBER,
+        status: user.status,
+        organizationId: user.organization?.id
+      }
+    }))
+  }
+
+  const handleDeleteUser = (user: UserWithRealtime) => {
+    setManagementState(prev => ({
+      ...prev,
+      showDeleteModal: true,
+      selectedUser: user
+    }))
+  }
+
+  const handleSaveUser = () => {
+    // Aquí se implementaría la lógica para guardar el usuario
+    console.log('Guardando usuario:', managementState.createForm)
+    setManagementState(prev => ({ ...prev, showCreateModal: false, createForm: { name: '', email: '', role: Role.MEMBER, status: UserStatus.ACTIVO } }))
+  }
+
+  const handleUpdateUser = () => {
+    // Aquí se implementaría la lógica para actualizar el usuario
+    console.log('Actualizando usuario:', managementState.editForm)
+    setManagementState(prev => ({ ...prev, showEditModal: false, selectedUser: null }))
+  }
+
+  const handleConfirmDelete = () => {
+    // Aquí se implementaría la lógica para eliminar el usuario
+    console.log('Eliminando usuario:', managementState.selectedUser?.id)
+    setManagementState(prev => ({ ...prev, showDeleteModal: false, selectedUser: null }))
+  }
 
   return (
     <div className="space-y-6">
@@ -372,10 +451,18 @@ export function UsersPage() {
         </Card>
       </div>
 
-      {/* Search */}
+      {/* Search and Actions */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Buscar Usuarios</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Buscar Usuarios</CardTitle>
+            {hasPermission(SystemPermission.USER_CREATE) && (
+              <Button onClick={handleCreateUser} className="flex items-center space-x-2">
+                <UserPlus className="h-4 w-4" />
+                <span>Crear Usuario</span>
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="relative">
@@ -491,9 +578,30 @@ export function UsersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="sm">
-                        Ver Perfil
-                      </Button>
+                      <div className="flex items-center space-x-2">
+                        <Button variant="ghost" size="sm">
+                          Ver Perfil
+                        </Button>
+                        {hasPermission(SystemPermission.USER_UPDATE) && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleEditUser(user)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {hasPermission(SystemPermission.USER_DELETE) && user.role !== Role.SUPER_ADMIN && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleDeleteUser(user)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -502,6 +610,203 @@ export function UsersPage() {
           </CardContent>
         </Card>
       ))}
+
+      {/* Modal de Crear Usuario */}
+      {managementState.showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <UserPlus className="h-5 w-5" />
+                <span>Crear Nuevo Usuario</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Nombre</label>
+                <Input
+                  value={managementState.createForm.name}
+                  onChange={(e) => setManagementState(prev => ({
+                    ...prev,
+                    createForm: { ...prev.createForm, name: e.target.value }
+                  }))}
+                  placeholder="Nombre completo"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Email</label>
+                <Input
+                  type="email"
+                  value={managementState.createForm.email}
+                  onChange={(e) => setManagementState(prev => ({
+                    ...prev,
+                    createForm: { ...prev.createForm, email: e.target.value }
+                  }))}
+                  placeholder="usuario@ejemplo.com"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Rol</label>
+                <select
+                  value={managementState.createForm.role}
+                  onChange={(e) => setManagementState(prev => ({
+                    ...prev,
+                    createForm: { ...prev.createForm, role: e.target.value as Role }
+                  }))}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value={Role.MEMBER}>Miembro</option>
+                  <option value={Role.MANAGER}>Manager</option>
+                  <option value={Role.ADMIN_ORG}>Admin Organización</option>
+                  {isAdmin() && <option value={Role.ADMIN_DRIMSOFT}>Admin DrimSoft</option>}
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Estado</label>
+                <select
+                  value={managementState.createForm.status}
+                  onChange={(e) => setManagementState(prev => ({
+                    ...prev,
+                    createForm: { ...prev.createForm, status: e.target.value as UserStatus }
+                  }))}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value={UserStatus.ACTIVO}>Activo</option>
+                  <option value={UserStatus.INVITADO}>Invitado</option>
+                  <option value={UserStatus.SUSPENDIDO}>Suspendido</option>
+                </select>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setManagementState(prev => ({ ...prev, showCreateModal: false }))}
+                >
+                  Cancelar
+                </Button>
+                <Button onClick={handleSaveUser}>
+                  Crear Usuario
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Modal de Editar Usuario */}
+      {managementState.showEditModal && managementState.selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Edit className="h-5 w-5" />
+                <span>Editar Usuario</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Nombre</label>
+                <Input
+                  value={managementState.editForm.name}
+                  onChange={(e) => setManagementState(prev => ({
+                    ...prev,
+                    editForm: { ...prev.editForm, name: e.target.value }
+                  }))}
+                  placeholder="Nombre completo"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Email</label>
+                <Input
+                  type="email"
+                  value={managementState.editForm.email}
+                  onChange={(e) => setManagementState(prev => ({
+                    ...prev,
+                    editForm: { ...prev.editForm, email: e.target.value }
+                  }))}
+                  placeholder="usuario@ejemplo.com"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Rol</label>
+                <select
+                  value={managementState.editForm.role}
+                  onChange={(e) => setManagementState(prev => ({
+                    ...prev,
+                    editForm: { ...prev.editForm, role: e.target.value as Role }
+                  }))}
+                  className="w-full p-2 border rounded-md"
+                  disabled={managementState.selectedUser.role === Role.SUPER_ADMIN}
+                >
+                  <option value={Role.MEMBER}>Miembro</option>
+                  <option value={Role.MANAGER}>Manager</option>
+                  <option value={Role.ADMIN_ORG}>Admin Organización</option>
+                  {isAdmin() && <option value={Role.ADMIN_DRIMSOFT}>Admin DrimSoft</option>}
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Estado</label>
+                <select
+                  value={managementState.editForm.status}
+                  onChange={(e) => setManagementState(prev => ({
+                    ...prev,
+                    editForm: { ...prev.editForm, status: e.target.value as UserStatus }
+                  }))}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value={UserStatus.ACTIVO}>Activo</option>
+                  <option value={UserStatus.INVITADO}>Invitado</option>
+                  <option value={UserStatus.SUSPENDIDO}>Suspendido</option>
+                </select>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setManagementState(prev => ({ ...prev, showEditModal: false, selectedUser: null }))}
+                >
+                  Cancelar
+                </Button>
+                <Button onClick={handleUpdateUser}>
+                  Guardar Cambios
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Modal de Confirmar Eliminación */}
+      {managementState.showDeleteModal && managementState.selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-red-600">
+                <Trash2 className="h-5 w-5" />
+                <span>Confirmar Eliminación</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                ¿Estás seguro de que deseas eliminar al usuario <strong>{managementState.selectedUser.name}</strong>?
+                Esta acción no se puede deshacer.
+              </p>
+              <div className="flex justify-end space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setManagementState(prev => ({ ...prev, showDeleteModal: false, selectedUser: null }))}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  variant="destructive"
+                  onClick={handleConfirmDelete}
+                >
+                  Eliminar Usuario
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

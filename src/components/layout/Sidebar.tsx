@@ -19,6 +19,8 @@ import { Button } from '@/components/ui/button'
 import { DrimSoftLogo } from '@/components/ui/DrimSoftLogo'
 import { Logo } from '@/components/ui/Logo'
 import { mockOrganizations } from '@/mocks/fixtures'
+import { SystemPermission, Role } from '@/types'
+import { PermissionGuard } from '@/components/ui/permission-guard'
 
 // Datos mock de plataformas de DrimSoft
 const drimsoftPlatforms = [
@@ -42,13 +44,13 @@ const drimsoftPlatforms = [
 
 const navigation = {
   admin_drimsoft: [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Organizaciones', href: '/institutions', icon: Building },
-    { name: 'Proyectos', href: '/projects', icon: FolderOpen },
-    { name: 'Usuarios', href: '/users', icon: Users },
-    { name: 'Reportes', href: '/reports', icon: BarChart3 },
-    { name: 'Auditoría', href: '/audit', icon: Shield },
-    { name: 'Configuración', href: '/config', icon: Settings },
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, permission: SystemPermission.USER_READ },
+    { name: 'Organizaciones', href: '/institutions', icon: Building, permission: SystemPermission.ORG_READ },
+    { name: 'Proyectos', href: '/projects', icon: FolderOpen, permission: SystemPermission.PROJECT_READ },
+    { name: 'Usuarios', href: '/users', icon: Users, permission: SystemPermission.USER_READ },
+    { name: 'Reportes', href: '/reports', icon: BarChart3, permission: SystemPermission.REPORTS_READ },
+    { name: 'Auditoría', href: '/audit', icon: Shield, permission: SystemPermission.AUDIT_READ },
+    { name: 'Configuración', href: '/config', icon: Settings, permission: SystemPermission.SYSTEM_CONFIG },
   ]
 }
 
@@ -248,29 +250,30 @@ export function Sidebar() {
                 (item.href !== '/dashboard' && location.pathname.startsWith(item.href))
               
               return (
-                <NavLink
-                  key={item.name}
-                  to={item.href}
-                  className={cn(
-                    "group relative flex items-center justify-between px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm font-medium rounded-2xl transition-all duration-300 font-['Inter']",
-                    isActive 
-                      ? 'bg-[#FFD369] text-[#222831] shadow-xl shadow-[#FFD369]/30 transform scale-105' 
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white hover:transform hover:scale-102'
-                  )}
-                  onClick={() => window.innerWidth < 1024 && setSidebarOpen(false)}
-                >
-                  <div className="flex items-center">
-                    <item.icon className={cn(
-                      "mr-3 sm:mr-4 h-5 w-5 sm:h-6 sm:w-6 transition-all duration-200",
-                      isActive ? 'text-[#222831]' : 'text-gray-500 dark:text-gray-400 group-hover:text-[#FFD369]'
-                    )} />
-                    <span className="font-medium">{item.name}</span>
-                  </div>
-                  
-                  {isActive && (
-                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 sm:h-8 bg-[#222831] rounded-r-full"></div>
-                  )}
-                </NavLink>
+                <PermissionGuard key={item.name} permission={item.permission}>
+                  <NavLink
+                    to={item.href}
+                    className={cn(
+                      "group relative flex items-center justify-between px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm font-medium rounded-2xl transition-all duration-300 font-['Inter']",
+                      isActive 
+                        ? 'bg-[#FFD369] text-[#222831] shadow-xl shadow-[#FFD369]/30 transform scale-105' 
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white hover:transform hover:scale-102'
+                    )}
+                    onClick={() => window.innerWidth < 1024 && setSidebarOpen(false)}
+                  >
+                    <div className="flex items-center">
+                      <item.icon className={cn(
+                        "mr-3 sm:mr-4 h-5 w-5 sm:h-6 sm:w-6 transition-all duration-200",
+                        isActive ? 'text-[#222831]' : 'text-gray-500 dark:text-gray-400 group-hover:text-[#FFD369]'
+                      )} />
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                    
+                    {isActive && (
+                      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 sm:h-8 bg-[#222831] rounded-r-full"></div>
+                    )}
+                  </NavLink>
+                </PermissionGuard>
               )
             })}
           </nav>
